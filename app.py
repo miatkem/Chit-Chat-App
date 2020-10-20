@@ -3,16 +3,21 @@ import flask
 import flask_socketio
 import flask_sqlalchemy
 import random
+from os.path import join, dirname
 from dotenv import load_dotenv
 from datetime import datetime
 from pytz import timezone
 import requests
+import models
 
 TIME_ZONE = timezone('US/Eastern');
 
 app = flask.Flask(__name__)
 socketio = flask_socketio.SocketIO(app)
 socketio.init_app(app, cors_allowed_origins="*")
+
+dotenv_path = join(dirname(__file__), 'sql.env')
+load_dotenv(dotenv_path)
 
 sql_user = os.environ['SQL_USER']
 sql_pwd = os.environ['SQL_PASSWORD']
@@ -23,8 +28,11 @@ database_uri = os.environ['DATABASE_URL']
 
 app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
 db = flask_sqlalchemy.SQLAlchemy(app)
+db.init_app(app)
+db.app = app
+db.create_all()
+db.session.commit()
 
-import models
 
 #flask storage
 messages = []
@@ -32,18 +40,14 @@ clients = {}
 
 @app.route('/')
 def start():
-    models.db.create_all()
-    db.session.commit()
-    
-    
     msgs=models.Messages.query.all()
-    messages = []
+    
     for msg in msgs:
         messages.append({'user':msg.name,
             'message':msg.message,
             'timestamp':msg.time,
         })
-    
+    print(messages)
     return flask.render_template('index.html')
 
 #user connects
