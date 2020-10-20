@@ -20,7 +20,7 @@ export function UserName() {
         Socket.emit('get userlist');
         Socket.on('current userlist', (users) => {
             var textbar = document.getElementById("nameInput");
-            setName(users[Socket.id]);
+            setName(users[Socket.id].name);
             textbar.value = name;
             return () => {
             Socket.off('current userlist');

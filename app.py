@@ -56,33 +56,43 @@ def on_connect():
 #user disconects
 @socketio.on('disconnect')
 def on_disconnect():
-    clients.clear()
+    for sid in clients:
+        clients[sid]['online']= False
+        
     socketio.emit('who is here',
         broadcast=True)
-    socketio.emit('current userlist',
-        clients
-    )
-    print(clients)
+        
+    print('Someone disconnected-->' + str(clients))
+    
+    
     
 #user verfies presence and sends SID
 @socketio.on('i am here')
 def on_arrive(clientId):
     if clientId not in clients:
-        clients[clientId]='Guest'
-    print(clients)
-
+        clients[clientId]={'name':'Guest',
+            'online':True
+        }
+        print('Someone connected-->' + str(clients))
+    else:
+        clients[clientId]['online'] = True
+    
+    socketio.emit('current userlist',
+        clients,
+        broadcast=True
+    )
 #user sends message
 @socketio.on('send message')
 def on_send_message(data):
     date=datetime.now(TIME_ZONE)
     
     #add message to db
-    db.session.add(models.Messages(clients[data['id']],data['message'],date.strftime("%H:%M %m/%d/%y")))
+    db.session.add(models.Messages(clients[data['id']]['name'],data['message'],date.strftime("%H:%M %m/%d/%y")))
     db.session.commit()
     
     #add message to this instance's data storage
     messages.append({
-        'user':clients[data['id']],
+        'user':clients[data['id']]['name'],
         'message':data['message'],
         'timestamp':date.strftime("%H:%M %m/%d/%y")
     })
@@ -154,7 +164,7 @@ def on_get_messages():
 # listen if a user changes the name
 @socketio.on('change name')
 def on_get_name(data):
-    clients[data['id']]=data['user']
+    clients[data['id']]['name']=data['user']
     
     # send an update to everyones user list
     socketio.emit('current userlist',
@@ -165,7 +175,6 @@ def on_get_name(data):
 # get the current user list
 @socketio.on('get userlist')
 def on_get_userlist():
-    print(clients)
     socketio.emit('current userlist',
         clients
     )
