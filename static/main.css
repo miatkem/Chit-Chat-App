@@ -1,0 +1,109 @@
+body {
+    background-color: #053A40;
+    font-family: 'Segoe UI';
+    color: #F9F1F1;
+    margin: 0;
+    z-index: 0;
+    text-align:center;
+}
+
+.userlist{
+    background-color: #FFF;
+    color:#000;
+    width:100px;
+    padding: 5px 10px 10px 10px;
+    text-align:center;
+    border:1px solid #41B6FF;
+    border-left: 6px solid #2196F3;
+    display: block;
+}
+
+.userlist p {
+    font-size:14px;
+    margin:10px auto 0;
+}
+
+.userlist ul{
+    font-size:12px;
+    margin-top: 10px;
+    list-style: none;
+    padding:1px;
+}
+
+.chat{
+    text-align:center;
+}
+
+.messagelist {
+    width:50%;
+    height:50%;
+    background-color:white;
+    color:black;
+    margin:auto;
+    padding:0;
+    overflow-y: scroll;
+    border-style: inset;
+    word-wrap: break-word;
+}
+
+.messagelist ul {
+    list-style: none;
+    margin: 15px 5px;
+    padding:0;
+    text-align:left;
+}
+
+.messagelist li {
+    text-align:left;
+    margin:auto;
+    width:100%;
+}
+
+.message {
+    display: inline-block;
+    text-align: left;
+    margin:0 10px 0 10px;
+    word-wrap: break-word;
+    width:90%;
+    
+}
+
+.messagetext {
+    margin:0;
+}
+
+.messagebox {
+    display: inline-block;
+    background-color:lightblue;
+    border-radius: 25px;
+    max-width:85%;
+    margin:auto;
+    text-align: left;
+    padding:5px 15px 5px 15px;
+}
+
+.user {
+    margin:0;
+    text-align:left;
+    font-size:12px;
+}
+
+.timestamp {
+    text-align:right;
+    margin:0 auto;
+    font-size:8px;
+}
+
+.messageinput {
+    width:50%;
+    text-align:center;
+    margin:auto;
+}
+
+.messageinput input {
+    width:80%;
+}
+
+.messageinput button {
+    width:20%;
+}
