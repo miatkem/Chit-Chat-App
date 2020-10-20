@@ -47,7 +47,6 @@ def start():
             'message':msg.message,
             'timestamp':msg.time,
         })
-    print(messages)
     return flask.render_template('index.html')
 
 #user connects
@@ -166,9 +165,10 @@ def on_get_messages():
     }, broadcast=True)
 
 # listen if a user changes the name
-@socketio.on('change name')
+@socketio.on('new google user')
 def on_get_name(data):
     clients[data['id']]['name']=data['user']
+    print(data['user'])
     
     # send an update to everyones user list
     socketio.emit('current userlist',

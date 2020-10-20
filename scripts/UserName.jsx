@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Socket } from './Socket';
+import { GoogleButton } from './GoogleButton';
 
 
 function handleSubmit(event) {
@@ -17,24 +18,16 @@ export function UserName() {
     const [name, setName] = React.useState("Guest");
     
     React.useEffect(() => {
-        Socket.emit('get userlist');
         Socket.on('current userlist', (users) => {
-            var textbar = document.getElementById("nameInput");
             setName(users[Socket.id].name);
-            textbar.value = name;
-            return () => {
-            Socket.off('current userlist');
-        }
-            
         });
-        
     });
         
     return (
-        <form onSubmit={handleSubmit} className='username'>
+        <form className='username'>
             <label htmlFor="nameInput">Your Name:</label>
-            <input type="text" id="nameInput" />
-            <button>Change Name</button>
+            <p id='nameInput'>{name}</p>
+            <GoogleButton />
         </form>
     );
 }
