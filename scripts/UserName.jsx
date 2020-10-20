@@ -32,7 +32,7 @@ export function UserName() {
         
     return (
         <form onSubmit={handleSubmit} className='username'>
-            <label for="nameInput">Your Name:</label>
+            <label htmlFor="nameInput">Your Name:</label>
             <input type="text" id="nameInput" />
             <button>Change Name</button>
         </form>
