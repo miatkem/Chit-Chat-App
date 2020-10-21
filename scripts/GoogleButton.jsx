@@ -23,7 +23,7 @@ export function GoogleButton() {
     return <GoogleLogin
         clientId="829909914851-6dnd3po5vfkgg3nbvm2jc75n31g9vvc0.apps.googleusercontent.com"
         render={renderProps => (
-          <button onClick={renderProps.onClick} disabled={renderProps.disabled}>Login with google</button>
+          <button onClick={renderProps.onClick} disabled={renderProps.disabled}>Login!</button>
         )}
         buttonText="Login"
         onSuccess={handleSubmit}

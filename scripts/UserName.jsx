@@ -16,19 +16,21 @@ function handleSubmit(event) {
 
 export function UserName() {
     const [name, setName] = React.useState("Guest");
+    const [pic, setPic] = React.useState("https://www.ibts.org/wp-content/uploads/2017/08/iStock-476085198.jpg");
     
     React.useEffect(() => {
         Socket.on('current userlist', (users) => {
             if (Socket.id in users){
                 console.log("SETTING NAME");
                 setName(users[Socket.id]["name"]);
+                setPic(users[Socket.id]["pic"]);
             }
         });
     });
         
     return (
         <form className='username'>
-            <label htmlFor="nameInput">Your Name:</label>
+            <img src={pic} class="profPic" />
             <p id='nameInput'>{name}</p>
             <GoogleButton />
         </form>

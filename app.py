@@ -81,7 +81,7 @@ def on_arrive(clientId):
         clients[clientId]={'name':'Guest',
             'online':False,
             'email':'unknown',
-            'pic':'unknown',
+            'pic':'https://www.ibts.org/wp-content/uploads/2017/08/iStock-476085198.jpg',
         }
         print('Someone connected-->' + str(clients))
         
