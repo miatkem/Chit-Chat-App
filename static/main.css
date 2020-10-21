@@ -111,3 +111,9 @@ body {
 #messageBtn {
     pointer-events: none;
 }
+
+.msgImg {
+    max-width:150px;
+    max-height:300px;
+    margin:10px auto;
+}

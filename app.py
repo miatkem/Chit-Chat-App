@@ -2,6 +2,7 @@ import os
 import flask
 import flask_socketio
 import flask_sqlalchemy
+import msgParser
 import random
 from os.path import join, dirname
 from dotenv import load_dotenv
@@ -24,7 +25,6 @@ sql_pwd = os.environ['SQL_PASSWORD']
 dbuser = os.environ['USER']
 database_uri = os.environ['DATABASE_URL']
 
-#
 
 app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
 db = flask_sqlalchemy.SQLAlchemy(app)
@@ -33,20 +33,22 @@ db.app = app
 db.create_all()
 db.session.commit()
 
-
 #flask storage
 messages = []
 clients = {}
+running = []
 
 @app.route('/')
 def start():
-    msgs=models.Messages.query.all()
-    
-    for msg in msgs:
-        messages.append({'user':msg.name,
-            'message':msg.message,
-            'timestamp':msg.time,
-        })
+    if len(running) == 0:
+        running.append("running")
+        msgs=models.Messages.query.all()
+        
+        for msg in msgs:
+            messages.append({'user':msg.name,
+                'message':msg.message,
+                'timestamp':msg.time,
+            })
     return flask.render_template('index.html')
 
 #user connects
@@ -97,14 +99,17 @@ def on_arrive(clientId):
 def on_send_message(data):
     date=datetime.now(TIME_ZONE)
     
+    msg = msgParser.parsePicturesAndLinks(data['message'])
+    print(msg)
+    
     #add message to db
-    db.session.add(models.Messages(clients[data['id']]['name'],data['message'],date.strftime("%H:%M %m/%d/%y")))
+    db.session.add(models.Messages(clients[data['id']]['name'],msg,date.strftime("%H:%M %m/%d/%y")))
     db.session.commit()
     
     #add message to this instance's data storage
     messages.append({
         'user':clients[data['id']]['name'],
-        'message':data['message'],
+        'message':msg,
         'timestamp':date.strftime("%H:%M %m/%d/%y")
     })
     
@@ -207,3 +212,36 @@ if __name__ == '__main__':
         port=int(os.getenv('PORT', 8080)),
         debug=False
     )
+
+def parsePicturesAndLinks(msg):
+    ret = ""
+    words=msg.split()
+    for word in words:
+        if word[:-4] == '.jpg' or word[:-4] == '.png' or word[:-4] == '.gif':
+            valid=False
+            try:
+                response = requests.get(word)
+                valid=True
+            except requests. ConnectionError as exception:
+                valid=False
+            if valid:
+                ret+="<img src='"+word+"' class='msgImg'/>"
+            else:
+                ret+=word
+        if word[:7] == 'https:' or word[:6] == 'http:' or word[:5] == 'www.' or word[:-4] == '.com' or word[:-4] == '.net' or word[:-4] == '.org' or word[:-4] == '.edu' or word[:-4] == '.org':
+            valid=False
+            try:
+                response = requests.get(word)
+                valid=True
+            except requests. ConnectionError as exception:
+                valid=False
+            if valid:
+                ret+="<a>"+word+"</a>"
+            else:
+                ret+=word
+        else:
+            ret+=word
+        
+        ret += " "
+    return ret
+        
