@@ -31,7 +31,7 @@ export function MessageList() {
             {
                 (messages || []).map(
                 (message, index) => 
-                    <li>
+                    <li key={'msg_' + index}>
                         <div className='message' id={'msg_' + index}>
                             <p className='user'><b>{message['user']}</b></p>
                             <div className='messagebox'>

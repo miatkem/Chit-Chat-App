@@ -79,11 +79,14 @@ def on_arrive(clientId):
         clients[clientId]={'name':'Guest',
             'online':False,
             'email':'unknown',
+            'pic':'unknown',
         }
         print('Someone connected-->' + str(clients))
         
+    elif clients[clientId]['email']!='unknown':
+        clients[clientId]['online']=True;
     else:
-        clients[clientId]['online']=True
+        clients[clientId]['online']=False;
         
     socketio.emit('current userlist',
         clients,
@@ -174,6 +177,7 @@ def on_get_messages():
 def on_get_name(data):
     clients[data['id']]['name']=data['user']
     clients[data['id']]['email']=data['email']
+    clients[data['id']]['pic']=data['pic']
     clients[data['id']]['online']=True
     print(data['user'])
     print(clients)
