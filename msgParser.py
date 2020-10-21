@@ -2,11 +2,7 @@ import requests
 def parsePicturesAndLinks(msg):
     ret = ""
     words=msg.split()
-    
-    print("WE ARE HERE")
-    
     for word in words:
-        print(word[-4:])
         if word[-4:] == '.jpg' or word[-4:] == '.png' or word[-4:] == '.gif':
             
             valid=False

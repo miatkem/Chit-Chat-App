@@ -17,7 +17,6 @@ function handleSubmit(event) {
 }
 
 export function MessageInput() {
-    
     React.useEffect(() => {
         Socket.on('current user', (clients) => {
             if (Socket.id in clients && clients[Socket.id]["online"] == true){

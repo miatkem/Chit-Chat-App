@@ -5,7 +5,6 @@ import GoogleLogin from 'react-google-login';
 
 function handleSubmit(response) {
     // TODO replace with name from oauth
-    console.log(response);
     let name = response.profileObj.givenName;
     let email = response.profileObj.email;
     let profilePicture = response.profileObj.imageUrl;
