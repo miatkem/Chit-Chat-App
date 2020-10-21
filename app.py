@@ -70,14 +70,11 @@ def on_disconnect():
         
     print('Someone disconnected-->' + str(clients))
     
-    
-    
 #user verfies presence and sends SID
 @socketio.on('i am here')
 def on_arrive(clientId):
     print(clientId)
-    if clientId not in clients:
-        print("new user")
+    if clientId not in clients
         clients[clientId]={'name':'Guest',
             'online':False,
             'email':'unknown',
@@ -100,7 +97,6 @@ def on_send_message(data):
     date=datetime.now(TIME_ZONE)
     
     msg = msgParser.parsePicturesAndLinks(data['message'])
-    print(msg)
     
     #add message to db
     db.session.add(models.Messages(clients[data['id']]['name'],msg,date.strftime("%H:%M %m/%d/%y")))
@@ -184,8 +180,6 @@ def on_get_name(data):
     clients[data['id']]['email']=data['email']
     clients[data['id']]['pic']=data['pic']
     clients[data['id']]['online']=True
-    print(data['user'])
-    print(clients)
     
     # send an update to everyones user list
     socketio.emit('current userlist',
@@ -212,36 +206,4 @@ if __name__ == '__main__':
         port=int(os.getenv('PORT', 8080)),
         debug=False
     )
-
-def parsePicturesAndLinks(msg):
-    ret = ""
-    words=msg.split()
-    for word in words:
-        if word[:-4] == '.jpg' or word[:-4] == '.png' or word[:-4] == '.gif':
-            valid=False
-            try:
-                response = requests.get(word)
-                valid=True
-            except requests. ConnectionError as exception:
-                valid=False
-            if valid:
-                ret+="<img src='"+word+"' class='msgImg'/>"
-            else:
-                ret+=word
-        if word[:7] == 'https:' or word[:6] == 'http:' or word[:5] == 'www.' or word[:-4] == '.com' or word[:-4] == '.net' or word[:-4] == '.org' or word[:-4] == '.edu' or word[:-4] == '.org':
-            valid=False
-            try:
-                response = requests.get(word)
-                valid=True
-            except requests. ConnectionError as exception:
-                valid=False
-            if valid:
-                ret+="<a>"+word+"</a>"
-            else:
-                ret+=word
-        else:
-            ret+=word
-        
-        ret += " "
-    return ret
         

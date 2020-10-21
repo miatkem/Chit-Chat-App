@@ -21,7 +21,6 @@ export function UserName() {
     React.useEffect(() => {
         Socket.on('current userlist', (users) => {
             if (Socket.id in users){
-                console.log("SETTING NAME");
                 setName(users[Socket.id]["name"]);
                 setPic(users[Socket.id]["pic"]);
             }
