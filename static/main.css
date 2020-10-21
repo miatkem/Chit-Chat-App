@@ -107,3 +107,7 @@ body {
 .messageinput button {
     width:20%;
 }
+
+#messageBtn {
+    pointer-events: none;
+}

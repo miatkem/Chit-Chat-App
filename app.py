@@ -60,6 +60,7 @@ def on_connect():
 @socketio.on('disconnect')
 def on_disconnect():
     for sid in clients:
+        print(clients[sid]['name'] + " is gone")
         clients[sid]['online']= False
         
     socketio.emit('who is here',
@@ -72,14 +73,18 @@ def on_disconnect():
 #user verfies presence and sends SID
 @socketio.on('i am here')
 def on_arrive(clientId):
+    print(clientId)
     if clientId not in clients:
+        print("new user")
         clients[clientId]={'name':'Guest',
-            'online':True
+            'online':False,
+            'email':'unknown',
         }
         print('Someone connected-->' + str(clients))
+        
     else:
-        clients[clientId]['online'] = True
-    
+        clients[clientId]['online']=True
+        
     socketio.emit('current userlist',
         clients,
         broadcast=True
@@ -168,19 +173,26 @@ def on_get_messages():
 @socketio.on('new google user')
 def on_get_name(data):
     clients[data['id']]['name']=data['user']
+    clients[data['id']]['email']=data['email']
+    clients[data['id']]['online']=True
     print(data['user'])
+    print(clients)
     
     # send an update to everyones user list
     socketio.emit('current userlist',
         clients,
         broadcast=True
     )
+    
+    socketio.emit('current user',
+        clients
+    )
 
 # get the current user list
 @socketio.on('get userlist')
 def on_get_userlist():
     socketio.emit('current userlist',
-        clients
+        clients,
     )
 
 # main

@@ -19,7 +19,10 @@ export function UserName() {
     
     React.useEffect(() => {
         Socket.on('current userlist', (users) => {
-            setName(users[Socket.id].name);
+            if (Socket.id in users){
+                console.log("SETTING NAME");
+                setName(users[Socket.id]["name"]);
+            }
         });
     });
         
