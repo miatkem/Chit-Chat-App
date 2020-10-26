@@ -13,7 +13,7 @@ KEY_TYPE = "type"
 KEY_INPUT = "input"
 KEY_EXPECTED = "expected"
 
-class MockedUnitTestCase(unittest.TestCase):
+class UnmockedUnitTestCase(unittest.TestCase):
     def test_parsePicturesAndLinks(self):
         self.test_params = [
             {
