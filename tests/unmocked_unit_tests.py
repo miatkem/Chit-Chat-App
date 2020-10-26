@@ -1,13 +1,15 @@
 import unittest
 
+from os.path import dirname, join
 import sys
-sys.path.append('../')
-
+sys.path.insert(1, join(dirname(__file__), '../'))
+from bot import bot
 from msgParser import parsePicturesAndLinks
 
 import unittest.mock as mock
 from os.path import join, dirname
 
+KEY_TYPE = "type"
 KEY_INPUT = "input"
 KEY_EXPECTED = "expected"
 
@@ -76,6 +78,78 @@ class MockedUnitTestCase(unittest.TestCase):
             
         for test_case in self.test_params:
             response = parsePicturesAndLinks(test_case[KEY_INPUT])
+            self.assertEqual(response,test_case[KEY_EXPECTED])
+            
+            
+            
+    def test_bot(self):
+        self.test_params = [
+            {
+                KEY_TYPE: "ABOUT",
+                KEY_INPUT: "!! about",
+                KEY_EXPECTED: "Hi, I am BobbyBot. I am a pretty fun guy. If there is something you need from me let me know. To find out what I am capable of typ !! help"
+            },
+            {
+                KEY_TYPE: "HELP",
+                KEY_INPUT: "!! help",
+                KEY_EXPECTED: "!! about - learn about me<br>!! help - shows this screen<br>!! funtranslate {message} - translate message to {language}<br>!! flip - flip a coin<br>!! bitcoin - I will tell you bitcoins price"
+            },
+            {
+                KEY_TYPE: "FUNTRANSLATE",
+                KEY_INPUT: "!! funtranslate Testing this is fun.",
+                KEY_EXPECTED: "esting-Tay is-thay is-way un-fay.  "
+            }, 
+            {
+                KEY_TYPE: "FUNTRANSLATE",
+                KEY_INPUT: "!! funtranslate Super Duper Fun!",
+                KEY_EXPECTED: "uper-Say uper-Day un-Fay! "
+            },
+            {
+                KEY_TYPE: "BITCOIN",
+                KEY_INPUT: "!! bitcoin",
+                KEY_EXPECTED: "1 bitcoin is currently worth money"
+            },
+            {
+                KEY_TYPE: "FLIP",
+                KEY_INPUT: "!! flip",
+                KEY_EXPECTED: "TEST"
+            },
+            {
+                KEY_TYPE: "FLIP",
+                KEY_INPUT: "!! flip",
+                KEY_EXPECTED: "TEST"
+            },
+            {
+                KEY_TYPE: "FLIP",
+                KEY_INPUT: "!! flip",
+                KEY_EXPECTED: "TEST"
+            },
+            {
+                KEY_TYPE: "FAIL",
+                KEY_INPUT: "!! test",
+                KEY_EXPECTED: "I don't know how to do that"
+            },
+            {
+                KEY_TYPE: "FAIL",
+                KEY_INPUT: "!! !! bitcoin",
+                KEY_EXPECTED: "I don't know how to do that"
+            },
+            {
+                KEY_TYPE: "FAIL",
+                KEY_INPUT: "!! apple",
+                KEY_EXPECTED: "I don't know how to do that"
+            },
+        ]
+            
+            
+        for test_case in self.test_params:
+            response = bot(test_case[KEY_INPUT])
+            if test_case[KEY_TYPE] == 'FUNTRANSLATE' and response[:5] == 'Sorry':
+                test_case[KEY_EXPECTED] = 'Sorry the limit for translations has been reached'
+            elif test_case[KEY_TYPE] == 'BITCOIN' and "1 bitcoin is currently worth " in response:
+                test_case[KEY_EXPECTED] = response
+            elif test_case[KEY_TYPE] == 'FLIP' and ("HEADS" in response or "TAILS" in response):
+                test_case[KEY_EXPECTED] = response
             self.assertEqual(response,test_case[KEY_EXPECTED])
     
 if __name__ == '__main__':
