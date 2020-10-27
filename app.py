@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 from datetime import datetime
 from pytz import timezone
 
-import models
+
 
 TIME_ZONE = timezone('US/Eastern');
 
@@ -28,11 +28,16 @@ database_uri = os.environ['DATABASE_URL']
 
 
 app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
-db = flask_sqlalchemy.SQLAlchemy(app)
-db.init_app(app)
-db.app = app
-db.create_all()
-db.session.commit()
+db = flask_sqlalchemy.SQLAlchemy()
+import models
+
+
+def init_db(app):
+    db.init_app(app)
+    db.app = app
+    models.db.create_all() 
+    db.session.commit() 
+
 
 #flask storage
 messages = []
@@ -55,7 +60,7 @@ def start():
 #user connects
 @socketio.on('connect')
 def on_connect():
-    socketio.emit('connected', {
+    return socketio.emit('connected', {
         'test': 'Connected'
     })
 
@@ -63,17 +68,16 @@ def on_connect():
 @socketio.on('disconnect')
 def on_disconnect():
     for sid in clients:
-        print(clients[sid]['name'] + " is gone")
         clients[sid]['online']= False
-        
-    socketio.emit('who is here',
+    
+    return socketio.emit('who is here',
         broadcast=True)
         
-    print('Someone disconnected-->' + str(clients))
+    
     
 #user verfies presence and sends SID
 @socketio.on('i am here')
-def on_arrive(clientId):
+def on_rollcall(clientId):
     print(clientId)
     if clientId not in clients:
         clients[clientId]={'name':'Guest',
@@ -88,7 +92,7 @@ def on_arrive(clientId):
     else:
         clients[clientId]['online']=False;
         
-    socketio.emit('current userlist',
+    return socketio.emit('current userlist',
         clients,
         broadcast=True
     )
@@ -96,7 +100,7 @@ def on_arrive(clientId):
 @socketio.on('send message')
 def on_send_message(data):
     date=datetime.now(TIME_ZONE)
-    
+    print("we're in")
     msg = msgParser.parsePicturesAndLinks(data['message'])
     
     #add message to db
@@ -122,11 +126,11 @@ def on_send_message(data):
         messages.append({
             'user':data['user'],
             'message':data['message'],
-            'timestamp':data['timestamp']
+            'timestamp':date.strftime("%H:%M %m/%d/%y")
         })
         
     #send all messages in storage to all users
-    socketio.emit('messages updated', {
+    return socketio.emit('messages updated', {
         'messages': messages
     }, broadcast=True)
 
@@ -140,7 +144,7 @@ def on_get_messages():
 
 # listen if a user changes the name
 @socketio.on('new google user')
-def on_get_name(data):
+def on_new_google_user(data):
     clients[data['id']]['name']=data['user']
     clients[data['id']]['email']=data['email']
     clients[data['id']]['pic']=data['pic']
@@ -152,19 +156,20 @@ def on_get_name(data):
         broadcast=True
     )
     
-    socketio.emit('current user',
+    return socketio.emit('current user',
         clients
     )
 
 # get the current user list
 @socketio.on('get userlist')
 def on_get_userlist():
-    socketio.emit('current userlist',
+    return socketio.emit('current userlist',
         clients,
     )
 
 # main
 if __name__ == '__main__': 
+    init_db(app)
     socketio.run(
         app,
         host=os.getenv('IP', '0.0.0.0'),
