@@ -182,10 +182,15 @@ class mocked_unit_test(unittest.TestCase):
                 self.assertEqual(response['data'],EXPECTEDCLIENTS)
     
     def test_getMessages(self):
+        MOCKCLIENTS = TESTCLIENTS.copy()
         MOCKMESSAGES = TESTMESSAGES.copy()
+        EXPECTEDMESSAGES = TESTMESSAGES.copy()
         with mock.patch("app.socketio.emit", mockEmit):
             with mock.patch("app.clients", MOCKCLIENTS):
                 with mock.patch("app.messages", MOCKMESSAGES):
+                    response = on_get_messages()
+                    self.assertTrue(response['response'] == 'messages updated')
+                    self.assertEqual(response['data']['messages'], EXPECTEDMESSAGES)
                     
                 
 

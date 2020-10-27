@@ -138,7 +138,7 @@ def on_send_message(data):
 # listen if a new user asks for messages
 @socketio.on('get messages')
 def on_get_messages():
-    socketio.emit('messages updated', {
+    return socketio.emit('messages updated', {
         'messages': messages
     }, broadcast=True)
 
