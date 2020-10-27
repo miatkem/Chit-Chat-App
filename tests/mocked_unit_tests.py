@@ -84,15 +84,17 @@ def mockEmit(response, data={}, broadcast=False):
         DATA: data,
         BROADCAST:broadcast,
     }
-    
     return ret
+    
     
 def fillMockDB(MOCKSESSION):
     for msg in TESTMESSAGES:
         MOCKSESSION.add(models.Messages(msg[USER],msg[MESSAGE],msg[TIMESTAMP]))
         
+        
 def mockRender(html):
     return "Successfully rendered " + html
+    
 
 class mocked_unit_test(unittest.TestCase):
     
@@ -101,7 +103,6 @@ class mocked_unit_test(unittest.TestCase):
 
     def tearDown(self):
         pass
-    
         
     def test_connect(self):
         MOCKCLIENTS = TESTCLIENTS.copy()
@@ -118,7 +119,6 @@ class mocked_unit_test(unittest.TestCase):
             }
             
         }
-
         
         mock_clientID = '005'
         with mock.patch("app.socketio.emit", mockEmit):
@@ -127,9 +127,6 @@ class mocked_unit_test(unittest.TestCase):
                 self.assertTrue(response[RESPONSE] == 'connected')
                 response = on_rollcall(mock_clientID)
                 self.assertEquals(response[DATA], EXPECTEDCLIENTS)
-                
-        
-        
                 
     def test_disconnect(self):
         MOCKCLIENTS = TESTCLIENTS.copy()
@@ -209,7 +206,6 @@ class mocked_unit_test(unittest.TestCase):
             MESSAGE:'Mock testing is awesome',
         }
     
-        
         EXPECTEDMESSAGES = [
             MOCKMESSAGES[0],
             MOCKMESSAGES[1],
@@ -221,7 +217,6 @@ class mocked_unit_test(unittest.TestCase):
             }
         ]
                         
-        
         with mock.patch("app.socketio.emit", mockEmit):
             with mock.patch("app.clients", MOCKCLIENTS):
                 with mock.patch("app.messages", MOCKMESSAGES):
@@ -313,7 +308,6 @@ class mocked_unit_test(unittest.TestCase):
         ]
         
         for bot in range(0,len(BOT_COMMANDS)):
-        
             MOCKCLIENTS = TESTCLIENTS.copy()
             MOCKMESSAGES = TESTMESSAGES.copy()
             MOCKSESSION = UnifiedAlchemyMagicMock()
@@ -367,7 +361,6 @@ class mocked_unit_test(unittest.TestCase):
         ]
         
         for bot in range(0,len(BOT_COMMANDS)):
-        
             MOCKCLIENTS = TESTCLIENTS.copy()
             MOCKMESSAGES = TESTMESSAGES.copy()
             MOCKSESSION = UnifiedAlchemyMagicMock()
