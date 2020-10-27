@@ -37,6 +37,7 @@ def init_db(app):
     db.app = app
     models.db.create_all() 
     db.session.commit() 
+    return True
 
 
 #flask storage

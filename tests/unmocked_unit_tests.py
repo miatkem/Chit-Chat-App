@@ -87,7 +87,7 @@ class UnmockedUnitTestCase(unittest.TestCase):
             {
                 KEY_TYPE: "ABOUT",
                 KEY_INPUT: "!! about",
-                KEY_EXPECTED: "Hi, I am BobbyBot. I am a pretty fun guy. If there is something you need from me let me know. To find out what I am capable of typ !! help"
+                KEY_EXPECTED: "Hi, I am BobbyBot. I am a pretty fun guy. If there is something you need from me let me know. To find out what I am capable of type !! help"
             },
             {
                 KEY_TYPE: "HELP",

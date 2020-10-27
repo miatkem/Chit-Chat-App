@@ -4,10 +4,9 @@ import mock
 import sys, os
 sys.path.append('../')
 
-import models
 import flask
-from app import app, socketio
-from app import db, on_connect, on_disconnect, on_rollcall, on_get_userlist, on_new_google_user, on_get_messages
+from app import app, socketio, models
+from app import db, on_connect, on_disconnect, on_rollcall, on_get_userlist, on_new_google_user, on_get_messages, on_send_message, start
 import flask_socketio
 import flask_sqlalchemy
 from datetime import datetime
@@ -39,6 +38,15 @@ def mockEmit(response, data={}, broadcast=False):
     }
     
     return ret
+    
+def fillMockDB(MOCKSESSION):
+    for msg in TESTMESSAGES:
+        MOCKSESSION.add(models.Messages(msg['user'],msg['message'],msg['timestamp']))
+        
+def mockRender(html):
+    return "Successfully rendered " + html
+    
+        
 
 TESTCLIENTS = {
     "001": {
@@ -191,8 +199,249 @@ class mocked_unit_test(unittest.TestCase):
                     response = on_get_messages()
                     self.assertTrue(response['response'] == 'messages updated')
                     self.assertEqual(response['data']['messages'], EXPECTEDMESSAGES)
-                    
+    
+    def test_sendNormalMessages(self):
+        MOCKCLIENTS = TESTCLIENTS.copy()
+        MOCKMESSAGES = TESTMESSAGES.copy()
+        
+        MOCKSESSION = UnifiedAlchemyMagicMock()
+        
+        TESTMESSAGE = {
+            'user':'Madison',
+            'id':'003',
+            'message':'Mock testing is awesome',
+        }
+    
+        
+        EXPECTEDMESSAGES = [
+            MOCKMESSAGES[0],
+            MOCKMESSAGES[1],
+            MOCKMESSAGES[2],
+            {
+                'user':'Madison',
+                'message':'Mock testing is awesome ',
+                'timestamp': datetime.now(TIME_ZONE).strftime("%H:%M %m/%d/%y")
+            }
+        ]
+                        
+        
+        with mock.patch("app.socketio.emit", mockEmit):
+            with mock.patch("app.clients", MOCKCLIENTS):
+                with mock.patch("app.messages", MOCKMESSAGES):
+                    with mock.patch("app.db.session", MOCKSESSION):
+                        fillMockDB(MOCKSESSION)
+                        response =on_send_message(TESTMESSAGE)
+                        self.assertTrue(response['response'] == 'messages updated')
+                        print(response['data']['messages'])
+                        self.assertEqual(response['data']['messages'], EXPECTEDMESSAGES)
+                        MOCKDB = MOCKSESSION.query(models.Messages).all()
+                        #self.assertEqual(MOCKDB, EXPECTEDMESSAGES)
+                        print(MOCKDB)
+                        for i in range(0,len(MOCKDB)):
+                            self.assertEqual(MOCKDB[i].name, EXPECTEDMESSAGES[i]['user'])
+                            self.assertEqual(MOCKDB[i].message, EXPECTEDMESSAGES[i]['message'])
+                            self.assertEqual(MOCKDB[i].time, EXPECTEDMESSAGES[i]['timestamp'])
+                            
+    def test_sendImageMessages(self):
+        MOCKCLIENTS = TESTCLIENTS.copy()
+        MOCKMESSAGES = TESTMESSAGES.copy()
+        MOCKSESSION = UnifiedAlchemyMagicMock()
+        TESTMESSAGE = {
+            'user':'Madison',
+            'id':'003',
+            'message':'This is an image https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Tokyo_Sky_Tree_2012.JPG/220px-Tokyo_Sky_Tree_2012.jpg',
+        }
+        EXPECTEDMESSAGES = [
+            MOCKMESSAGES[0],
+            MOCKMESSAGES[1],
+            MOCKMESSAGES[2],
+            {
+                'user':'Madison',
+                'message':"This is an image <img src='https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Tokyo_Sky_Tree_2012.JPG/220px-Tokyo_Sky_Tree_2012.jpg' class='msgImg'/> ",
+                'timestamp': datetime.now(TIME_ZONE).strftime("%H:%M %m/%d/%y")
+            }
+        ]
+        
+        with mock.patch("app.socketio.emit", mockEmit):
+            with mock.patch("app.clients", MOCKCLIENTS):
+                with mock.patch("app.messages", MOCKMESSAGES):
+                    with mock.patch("app.db.session", MOCKSESSION):
+                        fillMockDB(MOCKSESSION)
+                        response =on_send_message(TESTMESSAGE)
+                        self.assertTrue(response['response'] == 'messages updated')
+                        print(response['data']['messages'])
+                        self.assertEqual(response['data']['messages'], EXPECTEDMESSAGES)
+                        MOCKDB = MOCKSESSION.query(models.Messages).all()
+                        #self.assertEqual(MOCKDB, EXPECTEDMESSAGES)
+                        for i in range(0,len(MOCKDB)):
+                            self.assertEqual(MOCKDB[i].name, EXPECTEDMESSAGES[i]['user'])
+                            self.assertEqual(MOCKDB[i].message, EXPECTEDMESSAGES[i]['message'])
+                            self.assertEqual(MOCKDB[i].time, EXPECTEDMESSAGES[i]['timestamp'])
+    
+    def test_sendLinkMessages(self):
+        MOCKCLIENTS = TESTCLIENTS.copy()
+        MOCKMESSAGES = TESTMESSAGES.copy()
+        MOCKSESSION = UnifiedAlchemyMagicMock()
+        TESTMESSAGE = {
+            'user':'Madison',
+            'id':'003',
+            'message':'This is a link https://www.google.com/',
+        }
+        EXPECTEDMESSAGES = [
+            MOCKMESSAGES[0],
+            MOCKMESSAGES[1],
+            MOCKMESSAGES[2],
+            {
+                'user':'Madison',
+                'message':"This is a link <a href='https://www.google.com/' target='_blank'>https://www.google.com/</a> ",
+                'timestamp': datetime.now(TIME_ZONE).strftime("%H:%M %m/%d/%y")
+            }
+        ]
+        
+        with mock.patch("app.socketio.emit", mockEmit):
+            with mock.patch("app.clients", MOCKCLIENTS):
+                with mock.patch("app.messages", MOCKMESSAGES):
+                    with mock.patch("app.db.session", MOCKSESSION):
+                        fillMockDB(MOCKSESSION)
+                        response =on_send_message(TESTMESSAGE)
+                        self.assertTrue(response['response'] == 'messages updated')
+                        print(response['data']['messages'])
+                        self.assertEqual(response['data']['messages'], EXPECTEDMESSAGES)
+                        MOCKDB = MOCKSESSION.query(models.Messages).all()
+                        #self.assertEqual(MOCKDB, EXPECTEDMESSAGES)
+                        for i in range(0,len(MOCKDB)):
+                            self.assertEqual(MOCKDB[i].name, EXPECTEDMESSAGES[i]['user'])
+                            self.assertEqual(MOCKDB[i].message, EXPECTEDMESSAGES[i]['message'])
+                            self.assertEqual(MOCKDB[i].time, EXPECTEDMESSAGES[i]['timestamp'])
+    
+    def test_sendBotMessagesWithKnownResults(self):
+        BOT_COMMANDS = ['!! about', '!! help', '!! fakeCommand']
+        BOT_RESPONSES = [
+            'Hi, I am BobbyBot. I am a pretty fun guy. If there is something you need from me let me know. To find out what I am capable of type !! help',
+            '!! about - learn about me<br>!! help - shows this screen<br>!! funtranslate {message} - translate message to {language}<br>!! flip - flip a coin<br>!! bitcoin - I will tell you bitcoins price',
+            "I don't know how to do that"
+        ]
+        
+        for bot in range(0,len(BOT_COMMANDS)):
+        
+            MOCKCLIENTS = TESTCLIENTS.copy()
+            MOCKMESSAGES = TESTMESSAGES.copy()
+            MOCKSESSION = UnifiedAlchemyMagicMock()
+            TESTMESSAGE = {
+                'user':'Madison',
+                'id':'003',
+                'message':BOT_COMMANDS[bot],
+            }
+            EXPECTEDMESSAGES = [
+                MOCKMESSAGES[0],
+                MOCKMESSAGES[1],
+                MOCKMESSAGES[2],
+                {
+                    'user':'Madison',
+                    'message':BOT_COMMANDS[bot] + ' ',
+                    'timestamp': datetime.now(TIME_ZONE).strftime("%H:%M %m/%d/%y")
+                },
+                {
+                    'user':'Bobby Bot',
+                    'message':BOT_RESPONSES[bot],
+                    'timestamp': datetime.now(TIME_ZONE).strftime("%H:%M %m/%d/%y")
+                }
+            ]
+            
+            with mock.patch("app.socketio.emit", mockEmit):
+                with mock.patch("app.clients", MOCKCLIENTS):
+                    with mock.patch("app.messages", MOCKMESSAGES):
+                        with mock.patch("app.db.session", MOCKSESSION):
+                            fillMockDB(MOCKSESSION)
+                            response =on_send_message(TESTMESSAGE)
+                            self.assertTrue(response['response'] == 'messages updated')
+                            print(response['data']['messages'])
+                            self.assertEqual(response['data']['messages'], EXPECTEDMESSAGES)
+                            MOCKDB = MOCKSESSION.query(models.Messages).all()
+                            #self.assertEqual(MOCKDB, EXPECTEDMESSAGES)
+                            for i in range(0,len(MOCKDB)):
+                                self.assertEqual(MOCKDB[i].name, EXPECTEDMESSAGES[i]['user'])
+                                self.assertEqual(MOCKDB[i].message, EXPECTEDMESSAGES[i]['message'])
+                                self.assertEqual(MOCKDB[i].time, EXPECTEDMESSAGES[i]['timestamp'])
+    
+    def test_sendBotMessagesWithUnknownResults(self):
+        BOT_COMMANDS = ['!! flip', '!! funtranslate I like apples.']
+        BOT_RESPONSES = [
+            [
+               'The coin landed HEADS up', 
+               'The coin landed TAILS up'
+            ],
+            [
+                'I-way ike-lay apples-way.',
+                'Sorry the limit for translations has been reached'
                 
-
+            ]
+        ]
+        
+        for bot in range(0,len(BOT_COMMANDS)):
+        
+            MOCKCLIENTS = TESTCLIENTS.copy()
+            MOCKMESSAGES = TESTMESSAGES.copy()
+            MOCKSESSION = UnifiedAlchemyMagicMock()
+            TESTMESSAGE = {
+                'user':'Madison',
+                'id':'003',
+                'message':BOT_COMMANDS[bot],
+            }
+            EXPECTEDMESSAGES = [[
+                MOCKMESSAGES[0],
+                MOCKMESSAGES[1],
+                MOCKMESSAGES[2],
+                {
+                    'user':'Madison',
+                    'message':BOT_COMMANDS[bot] + ' ',
+                    'timestamp': datetime.now(TIME_ZONE).strftime("%H:%M %m/%d/%y")
+                },
+                {
+                    'user':'Bobby Bot',
+                    'message':BOT_RESPONSES[bot][0],
+                    'timestamp': datetime.now(TIME_ZONE).strftime("%H:%M %m/%d/%y")
+                }
+            ],[
+                MOCKMESSAGES[0],
+                MOCKMESSAGES[1],
+                MOCKMESSAGES[2],
+                {
+                    'user':'Madison',
+                    'message':BOT_COMMANDS[bot] + ' ',
+                    'timestamp': datetime.now(TIME_ZONE).strftime("%H:%M %m/%d/%y")
+                },
+                {
+                    'user':'Bobby Bot',
+                    'message':BOT_RESPONSES[bot][1],
+                    'timestamp': datetime.now(TIME_ZONE).strftime("%H:%M %m/%d/%y")
+                }
+            ]]
+            
+            with mock.patch("app.socketio.emit", mockEmit):
+                with mock.patch("app.clients", MOCKCLIENTS):
+                    with mock.patch("app.messages", MOCKMESSAGES):
+                        with mock.patch("app.db.session", MOCKSESSION):
+                            fillMockDB(MOCKSESSION)
+                            response =on_send_message(TESTMESSAGE)
+                            self.assertTrue(response['response'] == 'messages updated')
+                            print(response['data']['messages'])
+                            self.assertTrue((response['data']['messages'] == EXPECTEDMESSAGES[0]) or (response['data']['messages'] == EXPECTEDMESSAGES[1]))
+                            MOCKDB = MOCKSESSION.query(models.Messages).all()
+                            #self.assertEqual(MOCKDB, EXPECTEDMESSAGES)
+                            for i in range(0,len(MOCKDB)):
+                                self.assertEqual(MOCKDB[i].name, EXPECTEDMESSAGES[0][i]['user'])
+                                self.assertTrue(MOCKDB[i].message==EXPECTEDMESSAGES[0][i]['message'] 
+                                    or MOCKDB[i].message==EXPECTEDMESSAGES[1][i]['message'])
+                                self.assertEqual(MOCKDB[i].time, EXPECTEDMESSAGES[0][i]['timestamp'])
+                                
+    def test_start(self):
+        MOCKSESSION = UnifiedAlchemyMagicMock()
+        with mock.patch("app.db.session", MOCKSESSION):
+            with mock.patch("flask.render_template", mockRender):
+                response = start()
+                self.assertEqual(response, "Successfully rendered index.html")
+                
+            
 if __name__ == '__main__':
     unittest.main()

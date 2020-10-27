@@ -6,7 +6,7 @@ def bot(message):
     spltmsg = message.split()
     cmd = spltmsg[1]
     if cmd == 'about': # description of bot
-        return 'Hi, I am BobbyBot. I am a pretty fun guy. If there is something you need from me let me know. To find out what I am capable of typ !! help'
+        return 'Hi, I am BobbyBot. I am a pretty fun guy. If there is something you need from me let me know. To find out what I am capable of type !! help'
     elif cmd == 'help': # command list
         ret = "!! about - learn about me<br>"
         ret += "!! help - shows this screen<br>"
@@ -24,8 +24,8 @@ def bot(message):
     elif cmd == 'funtranslate': # translate to piglatin
         url = "https://api.funtranslations.com/translate/pig-latin.json?text="
         for i in range(2,len(spltmsg)):
-            url+=spltmsg[i] + '%20'
-        r=requests.get(url)
+            url+=spltmsg[i] + '+'
+        r=requests.get(url[:-1])
         data = r.json()
         try: 
             ret = data["contents"]["translated"]
