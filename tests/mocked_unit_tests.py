@@ -5,8 +5,11 @@ import sys, os
 sys.path.append('../')
 
 import models
+import flask
 from app import app, socketio
 from app import db
+import flask_socketio
+import flask_sqlalchemy
 from alchemy_mock.mocking import UnifiedAlchemyMagicMock
 
 EXPECTED_PICTURE = 'pic'
@@ -23,9 +26,11 @@ DEFAULT_EMAIL = 'unknown'
 DEFAULT_PICTURE = "https://www.ibts.org/wp-content/uploads/2017/08/iStock-476085198.jpg"
 DEFAULT_NAMESPACE = '/'
 
+import os
 
-class Test_Client(unittest.TestCase):
-    
+
+class mocked_unit_test(unittest.TestCase):
+        
     def setUp(self):
         pass
 
@@ -112,10 +117,6 @@ class Test_Client(unittest.TestCase):
         print(client.sid)
         client.disconnect()
         self.assertFalse(client.is_connected())
-        
-        
-        
-        
     
     """
     def test_send_message(self):

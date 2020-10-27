@@ -102,7 +102,7 @@ class UnmockedUnitTestCase(unittest.TestCase):
             {
                 KEY_TYPE: "FUNTRANSLATE",
                 KEY_INPUT: "!! funtranslate Super Duper Fun!",
-                KEY_EXPECTED: "uper-Say uper-Day un-Fay! "
+                KEY_EXPECTED: "uper-Say uper-Day un-Fay!  "
             },
             {
                 KEY_TYPE: "BITCOIN",
