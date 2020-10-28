@@ -31,7 +31,7 @@ export default function MessageInput() {
   return (
     <form onSubmit={handleSubmit} className="messageinput">
       <input type="text" id="tb" placeholder="You must login before sending a message" />
-      <button type="submit" id="messageBtn">Send</button>
+      <button type="button" id="messageBtn">Send</button>
     </form>
   );
 }
