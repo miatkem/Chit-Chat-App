@@ -11,7 +11,7 @@ from pytz import timezone
 
 import msg_parser
 from bot import bot
-import models
+
 
 TIME_ZONE = timezone('US/Eastern')
 
@@ -30,11 +30,15 @@ database_uri = os.environ['DATABASE_URL']
 
 app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
 db = flask_sqlalchemy.SQLAlchemy(app)
+
+import models
+
 """Init database"""
-db.init_app(app)
-db.app = app
-db.create_all()
-db.session.commit()
+def db_init():
+    db.init_app(app)
+    db.app = app
+    db.create_all()
+    db.session.commit()
 
 #flask storage
 messages = []
@@ -177,6 +181,7 @@ def on_get_userlist():
 
 # main
 if __name__ == '__main__':
+    db_init()
     socketio.run(
         app,
         host=os.getenv('IP', '0.0.0.0'),

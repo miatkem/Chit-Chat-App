@@ -112,12 +112,12 @@ class UnmockedUnitTestCase(unittest.TestCase):
             {
                 KEY_TYPE: "FUNTRANSLATE",
                 KEY_INPUT: "!! funtranslate Testing this is fun.",
-                KEY_EXPECTED: "esting-Tay is-thay is-way un-fay.  "
+                KEY_EXPECTED: "esting-Tay is-thay is-way un-fay."
             },
             {
                 KEY_TYPE: "FUNTRANSLATE",
                 KEY_INPUT: "!! funtranslate Super Duper Fun!",
-                KEY_EXPECTED: "uper-Say uper-Day un-Fay!  "
+                KEY_EXPECTED: "uper-Say uper-Day un-Fay!"
             },
             {
                 KEY_TYPE: "BITCOIN",
