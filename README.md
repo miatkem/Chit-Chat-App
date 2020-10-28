@@ -2,6 +2,14 @@
 
 This app allows users to talk in real time with another of the a browser. There is also a bot that is useful for a variety of features.
 
+## M3 Questions
+
+### Why did you choose to test the code that you did?
+I chose to test the code that I did because as projects grow and become more complex they many times become delicate. If a bug occurs finding that bug with premade test cases could take hours. I built out unit test cases so that in the future finding bugs will be very easy. I can also run this test at anytime to make sure that everything is working the way its supposed to.
+
+### Is there anything else you would like to test if you had the time (or was asked to do so)?
+I tested just about everything in my project. Now that I learned unit testing I plan on using these skills to make test cases for my old projects. I may even go back to my recipe app and add unit tests, just to improve the project before I put it in my portfolio. 
+
 # Setup
 ### Step 1 - Clone Repository
 1. Open a terminal in your environment
@@ -58,6 +66,12 @@ This app allows users to talk in real time with another of the a browser. There 
     "Reveal Config Vars" and add the key value pairs for the five keys (use the same key names)
 6. In terminal push again to start app again with the command 'git push heroku master'
 
+## Running Tests
+In the main directory simply run this command:
+
+coverage run -m --source=. unittest tests/*.py && coverage html
+
+Then, look at the index.html file in the /htmlcov folder to see the coverage of the tests
 
 ## Issues
 
