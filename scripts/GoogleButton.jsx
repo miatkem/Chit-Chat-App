@@ -1,5 +1,5 @@
 import * as React from 'react';
-import GoogleLogin from 'react-google-login';
+import { GoogleLogin } from 'react-google-login';
 import { Socket } from './Socket';
 
 function handleSubmit(response) {
