@@ -8,21 +8,22 @@ export default function MessageList() {
     return [];
   });
 
-  function updateMessages(data) {
-    const msg  = data;
-    setMessages(msg);
-    const newestMessage = document.getElementById(`msg_${msg.length - 1}`);
-    if (msg.length > 0) {
-      newestMessage.scrollIntoView();
-    }
-  }
-
   React.useEffect(() => {
     Socket.on('messages updated', updateMessages);
     return () => {
       Socket.off('messages updated', updateMessages);
     };
   });
+
+  function updateMessages(data) {
+    console.log('updating messages now');
+    const { messages } = data;
+    setMessages(messages);
+    const newest_message = document.getElementById(`msg_${messages.length - 1}`);
+    if (messages.length > 0) {
+      newest_message.scrollIntoView();
+    }
+  }
 
   return (
     <div className="messagelist">
