@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { GoogleLogin } from 'react-google-login';
+import ReactDOM from 'react-dom';
+import GoogleLogin from 'react-google-login';
 import { Socket } from './Socket';
 
 function handleSubmit(response) {
@@ -26,7 +27,7 @@ export default function GoogleButton() {
       buttonText="Login"
       onSuccess={handleSubmit}
       onFailure={handleSubmit}
-      cookiePolicy="single_host_origin"
+      cookiePolicy={"single_host_origin"}
     />
   );
 }
