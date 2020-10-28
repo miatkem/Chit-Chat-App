@@ -151,6 +151,7 @@ def on_get_messages():
 @socketio.on('new google user')
 def on_new_google_user(data):
     """update client info with google data"""
+    print('google content sent')
     clients[data['id']]['name']=data['user']
     clients[data['id']]['email']=data['email']
     clients[data['id']]['pic']=data['pic']
