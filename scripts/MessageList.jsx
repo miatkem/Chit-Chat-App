@@ -9,7 +9,7 @@ export default function MessageList() {
   });
 
   function updateMessages(data) {
-    const { msg } = data;
+    const msg  = data;
     setMessages(msg);
     const newestMessage = document.getElementById(`msg_${msg.length - 1}`);
     if (msg.length > 0) {
